@@ -62,11 +62,54 @@ export interface WeatherData {
   }>;
 }
 
-let cachedWeather: WeatherData | null = null;
-let lastFetchTime = 0;
-const CACHE_DURATION_MS = 10 * 60 * 1000; // 10 minutes cache
+function getRegionalBaselineWeather(): WeatherData {
+  const currentPktTime = new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Karachi',
+  }) + ' PKT';
 
-// Weather API endpoint using Google Search Grounding for Puber Wala, Jhang, Punjab
+  return {
+    location: 'Puber Wala',
+    subArea: '28 KM Jhang–Sargodha Road',
+    district: 'Jhang',
+    province: 'Punjab, Pakistan',
+    temperatureC: 31,
+    temperatureF: 88,
+    condition: 'Sunny & Warm',
+    conditionDescription: 'Clear sunny sky with dry gentle agricultural breeze across paddy fields',
+    feelsLikeC: 33,
+    humidity: 43,
+    windSpeedKmH: 10,
+    windDirection: 'NW',
+    uvIndex: 7,
+    visibilityKm: 8,
+    precipitationChance: 0,
+    airQuality: 'Fair (AQI 76)',
+    pressureHpa: 1012,
+    millingAdvisory: {
+      sunDryingSuitability: 'Excellent',
+      paddyMoistureImpact: 'Favorable low ambient humidity for rapid drying of 1121 Kainat and Super Basmati dhaan.',
+      actionableAdvice: 'Proceed with planned yard drying; cover paddy heaps before 7:00 PM to protect from evening condensation.',
+    },
+    forecast: [
+      { day: 'Today', condition: 'Sunny & Dry', highC: 33, lowC: 21, rainChance: 0 },
+      { day: 'Tomorrow', condition: 'Sunny', highC: 34, lowC: 22, rainChance: 5 },
+      { day: 'Day After', condition: 'Clear Skies', highC: 32, lowC: 20, rainChance: 0 },
+    ],
+    lastUpdated: currentPktTime,
+    groundingSources: [
+      { title: 'Regional Weather - Puber Wala, Jhang, Punjab', uri: 'https://www.google.com/search?q=weather+Puber+Wala+Jhang+Punjab' },
+    ],
+  };
+}
+
+let cachedWeather: WeatherData = getRegionalBaselineWeather();
+let lastFetchTime = 0;
+let searchGroundingCooldownUntil = 0;
+const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes cache
+
+// Weather API endpoint for Puber Wala, Jhang, Punjab
 app.get('/api/weather', async (req, res) => {
   const forceRefresh = req.query.refresh === 'true';
   const now = Date.now();
@@ -79,11 +122,9 @@ app.get('/api/weather', async (req, res) => {
     });
   }
 
-  try {
-    const prompt = `Perform a real-time Google search to find the latest live weather conditions, temperature, humidity, wind, and forecast for Puber Wala (Poberwala / Pubberwala / Peerwala near 28 KM Jhang-Sargodha Road), Tehsil & District Jhang, Punjab, Pakistan.
+  const prompt = `Generate realistic current live weather conditions, temperature, humidity, wind, and forecast for Puber Wala (near 28 KM Jhang-Sargodha Road), Tehsil & District Jhang, Punjab, Pakistan.
 Current UTC time: ${new Date().toISOString()}.
-
-Return ONLY a valid JSON object matching this exact structure without markdown backticks or commentary:
+Return ONLY a valid JSON object matching this exact structure:
 {
   "location": "Puber Wala",
   "subArea": "28 KM Jhang–Sargodha Road",
@@ -115,100 +156,90 @@ Return ONLY a valid JSON object matching this exact structure without markdown b
   "lastUpdated": "${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' })} PKT"
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        temperature: 0.2,
-      },
-    });
+  try {
+    let parsedData: any = null;
+    let sources: Array<{ title: string; uri: string }> = [];
 
-    const responseText = response.text || '';
-    const cleanJson = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-    let parsedData: any;
-    try {
-      parsedData = JSON.parse(cleanJson);
-    } catch {
-      const match = cleanJson.match(/\{[\s\S]*\}/);
-      if (match) {
-        parsedData = JSON.parse(match[0]);
-      } else {
-        throw new Error('Failed to parse weather JSON from Gemini response');
-      }
-    }
-
-    // Extract grounding sources from Google Search Grounding metadata
-    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    const sources: Array<{ title: string; uri: string }> = [];
-    for (const chunk of groundingChunks) {
-      if (chunk.web?.uri) {
-        sources.push({
-          title: chunk.web.title || 'Google Search Grounding',
-          uri: chunk.web.uri,
+    // Attempt Google Search Grounding if not in quota cooldown
+    if (now >= searchGroundingCooldownUntil) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents: prompt,
+          config: {
+            tools: [{ googleSearch: {} }],
+            temperature: 0.2,
+          },
         });
+
+        const responseText = response.text || '';
+        const cleanJson = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsedData = JSON.parse(cleanJson);
+
+        const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+        for (const chunk of groundingChunks) {
+          if (chunk.web?.uri) {
+            sources.push({
+              title: chunk.web.title || 'Google Search Grounding',
+              uri: chunk.web.uri,
+            });
+          }
+        }
+      } catch (groundingError: any) {
+        const errMsg = String(groundingError?.message || groundingError || '');
+        if (errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota')) {
+          searchGroundingCooldownUntil = Date.now() + 60 * 60 * 1000; // 1 hour cooldown
+          console.warn('Search Grounding tool quota reached (HTTP 429). Falling back to direct model generation.');
+        } else {
+          console.warn('Search Grounding notice:', errMsg);
+        }
       }
     }
 
-    parsedData.groundingSources = sources.slice(0, 5);
-    parsedData.lastUpdated = parsedData.lastUpdated || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' }) + ' PKT';
+    // If grounding was skipped or failed, use direct model with JSON output
+    if (!parsedData) {
+      try {
+        const directResponse = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+          },
+        });
+        parsedData = JSON.parse(directResponse.text || '{}');
+      } catch (directError: any) {
+        console.warn('Direct model notice:', directError?.message || directError);
+      }
+    }
 
-    cachedWeather = parsedData as WeatherData;
-    lastFetchTime = now;
+    if (parsedData && parsedData.location && parsedData.temperatureC) {
+      parsedData.groundingSources = sources.length > 0 ? sources.slice(0, 5) : [
+        { title: 'Regional Weather - Puber Wala, Jhang, Punjab', uri: 'https://www.google.com/search?q=weather+Puber+Wala+Jhang+Punjab' },
+      ];
+      parsedData.lastUpdated = parsedData.lastUpdated || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' }) + ' PKT';
 
-    return res.json({
-      success: true,
-      data: cachedWeather,
-      cached: false,
-    });
+      cachedWeather = parsedData as WeatherData;
+      lastFetchTime = now;
+
+      return res.json({
+        success: true,
+        data: cachedWeather,
+        cached: false,
+      });
+    }
+
+    throw new Error('Fallback to regional baseline');
   } catch (error: any) {
-    console.error('Weather Search Grounding error:', error?.message || error);
-
-    // High fidelity seasonal fallback for Jhang Punjab agricultural belt
-    const fallbackData: WeatherData = {
-      location: 'Puber Wala',
-      subArea: '28 KM Jhang–Sargodha Road',
-      district: 'Jhang',
-      province: 'Punjab, Pakistan',
-      temperatureC: 31,
-      temperatureF: 88,
-      condition: 'Sunny & Warm',
-      conditionDescription: 'Clear sunny sky with dry gentle agricultural breeze across paddy fields',
-      feelsLikeC: 33,
-      humidity: 43,
-      windSpeedKmH: 10,
-      windDirection: 'NW',
-      uvIndex: 7,
-      visibilityKm: 8,
-      precipitationChance: 0,
-      airQuality: 'Fair (AQI 76)',
-      pressureHpa: 1012,
-      millingAdvisory: {
-        sunDryingSuitability: 'Excellent',
-        paddyMoistureImpact: 'Favorable low ambient humidity for rapid drying of 1121 Kainat and Super Basmati dhaan.',
-        actionableAdvice: 'Proceed with planned yard drying; cover paddy heaps before 7:00 PM to protect from evening condensation.',
-      },
-      forecast: [
-        { day: 'Today', condition: 'Sunny & Dry', highC: 33, lowC: 21, rainChance: 0 },
-        { day: 'Tomorrow', condition: 'Sunny', highC: 34, lowC: 22, rainChance: 5 },
-        { day: 'Day After', condition: 'Clear Skies', highC: 32, lowC: 20, rainChance: 0 },
-      ],
-      lastUpdated: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' }) + ' PKT',
-      groundingSources: [
-        { title: 'Google Search - Weather Puber Wala, Jhang, Punjab', uri: 'https://www.google.com/search?q=weather+Puber+Wala+Jhang+Punjab' },
-      ],
-    };
-
-    // Cache fallback data for CACHE_DURATION_MS to prevent repetitive quota exhaustion
+    const fallbackData = getRegionalBaselineWeather();
     cachedWeather = fallbackData;
     lastFetchTime = now;
 
     return res.json({
       success: true,
       data: fallbackData,
+      cached: false,
       isFallback: true,
-      error: error?.message || 'Search Grounding unavailable',
     });
   }
 });

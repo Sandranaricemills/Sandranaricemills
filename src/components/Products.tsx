@@ -41,7 +41,7 @@ export const Products: React.FC = () => {
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 4000);
     } catch (err) {
-      console.error('Failed to generate catalog PDF:', err);
+      console.warn('Failed to generate catalog PDF:', err);
     } finally {
       setIsDownloadingPdf(false);
     }
