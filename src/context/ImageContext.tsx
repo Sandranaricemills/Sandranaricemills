@@ -85,7 +85,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       if (key === 'punjab_heritage') {
         return {
-          url: 'https://lh3.googleusercontent.com/d/1EJQ5ASXVd28U9MUITuoJsZ-c8C3zCER8',
+          url: '/images/Punjab%20culture%20heritage.png',
           fileName: slot.defaultFileName,
           isCustom: false,
         };
