@@ -1,10 +1,11 @@
 import React from 'react';
-import { MillImage } from './common/MillImage';
 import { useLanguage } from '../context/LanguageContext';
-import { MapPin, Award, ShieldCheck, HeartHandshake, Sparkles } from 'lucide-react';
+import { useImage } from '../context/ImageContext';
+import { MapPin, Award, ShieldCheck, HeartHandshake, Sparkles, ZoomIn } from 'lucide-react';
 
 export const AboutUs: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const { openLightbox } = useImage();
 
   return (
     <section id="about" className="py-20 bg-[#FAF8F5] relative overflow-hidden border-b border-stone-200/60">
@@ -29,14 +30,42 @@ export const AboutUs: React.FC = () => {
           
           {/* Left Column: Visual Showcase (Authentic Punjab Agricultural Collage) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="rounded-xl overflow-hidden shadow-xl border border-stone-200 bg-white">
-              <MillImage
-                slotKey="punjab_heritage"
-                alt="Punjab agricultural heritage and rice farming traditions"
-                className="w-full h-auto max-h-[480px] object-cover"
-                allowZoom={true}
-                badgeLabel={isUrdu ? 'خالص پنجابی زراعت و دھان' : 'Authentic Punjab Agriculture'}
-              />
+            <div className="rounded-2xl overflow-hidden shadow-2xl border border-[#D4AF37]/35 hover:border-[#D4AF37]/65 transition-all duration-500 bg-stone-900 group">
+              <div
+                className="relative aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden cursor-pointer"
+                onClick={() =>
+                  openLightbox(
+                    '/images/Punjab%20culture%20heritage.png',
+                    isUrdu ? 'پنجاب زرعی ورثہ و روایات' : 'Punjab Agricultural Heritage & Culture',
+                    isUrdu
+                      ? 'پنجاب کے زرخیز کھیت، روایتی شجرکاری اور سنہری دھان کی فصل'
+                      : 'Five-panel authentic agricultural showcase: paddy dawn, lush panicles, traditional farmers transplanting, flooded fields, and Pakistani flag in field.'
+                  )
+                }
+              >
+                {/* Selected Element: img:nth-of-type(1) */}
+                <img
+                  src="/images/Punjab%20culture%20heritage.png"
+                  alt={isUrdu ? 'پنجاب زرعی ثقافت اور دھان کی کاشتکاری' : 'Punjab agricultural heritage and authentic rice farming traditions'}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out contrast-[1.03] brightness-[1.01]"
+                  loading="eager"
+                />
+
+                {/* Subtle vignette and gold accent rim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
+
+                {/* Hover zoom icon */}
+                <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                  <span className="p-3 bg-white/95 rounded-full text-slate-900 shadow-xl transition transform group-hover:scale-110">
+                    <ZoomIn className="w-5 h-5 text-[#B89222]" />
+                  </span>
+                </div>
+
+                {/* Badge */}
+                <div className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md border border-[#D4AF37]/40 text-[#F5D061] text-xs font-semibold tracking-wide rounded-md shadow-md">
+                  {isUrdu ? 'خالص پنجابی زراعت و دھان' : 'Authentic Punjab Agriculture'}
+                </div>
+              </div>
             </div>
             
             <div className="p-4 bg-white/80 backdrop-blur-xs rounded-lg border border-stone-200 flex items-center justify-between text-xs text-slate-600">

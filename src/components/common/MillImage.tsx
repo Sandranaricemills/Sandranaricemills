@@ -76,6 +76,10 @@ export const MillImage: React.FC<MillImageProps> = ({
 
     if (fallbackStep === 2) {
       setFallbackStep(3);
+      if (slotKey === 'punjab_heritage') {
+        setCurrentSrc('/images/Punjab%20culture%20heritage.png');
+        return;
+      }
       if (slotKey === 'leadership_mamtaz') {
         setCurrentSrc('/images/leadership_mamtaz.png');
         return;
