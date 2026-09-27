@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   X,
   Wheat,
+  Clock,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -67,6 +68,43 @@ export const WeatherWidget: React.FC = () => {
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [showSourcesModal, setShowSourcesModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatPstDateTime = (date: Date) => {
+    try {
+      const timeStr = new Intl.DateTimeFormat(isUrdu ? 'ur-PK' : 'en-US', {
+        timeZone: 'Asia/Karachi',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      }).format(date);
+
+      const dateStr = new Intl.DateTimeFormat(isUrdu ? 'ur-PK' : 'en-US', {
+        timeZone: 'Asia/Karachi',
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }).format(date);
+
+      return { timeStr, dateStr };
+    } catch {
+      return {
+        timeStr: date.toLocaleTimeString(),
+        dateStr: date.toLocaleDateString(),
+      };
+    }
+  };
+
+  const { timeStr, dateStr } = formatPstDateTime(currentDateTime);
 
   const fetchWeather = async (isManualRefresh = false) => {
     if (isManualRefresh) {
@@ -155,18 +193,32 @@ export const WeatherWidget: React.FC = () => {
         {/* Header Block with Grounding Badge */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            {/* Real-time Google Search Grounding Badge */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-[#D4AF37]/40 text-[#E4C868] text-xs font-semibold tracking-wider uppercase mb-3.5 backdrop-blur-md shadow-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              <span className="text-white font-bold">{t.weather.liveStatus}</span>
-              <span className="text-[#D4AF37]/60">•</span>
-              <span className="flex items-center gap-1 text-[#F5D061]">
-                <Search className="w-3 h-3 text-[#D4AF37]" />
-                {t.weather.groundedBadge}
-              </span>
+            {/* Real-time Google Search Grounding Badge & Live Date/Time */}
+            <div className="flex flex-wrap items-center gap-2.5 mb-3.5">
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-[#D4AF37]/40 text-[#E4C868] text-xs font-semibold tracking-wider uppercase backdrop-blur-md shadow-sm">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span className="text-white font-bold">{t.weather.liveStatus}</span>
+                <span className="text-[#D4AF37]/60">•</span>
+                <span className="flex items-center gap-1 text-[#F5D061]">
+                  <Search className="w-3 h-3 text-[#D4AF37]" />
+                  {t.weather.groundedBadge}
+                </span>
+              </div>
+
+              {/* Live PST Date & Time Pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-[#D4AF37]/40 text-xs text-stone-200 backdrop-blur-md shadow-sm">
+                <Calendar className="w-3.5 h-3.5 text-[#F5D061]" />
+                <span className="text-stone-200 font-medium">{dateStr}</span>
+                <span className="text-[#D4AF37]/60">•</span>
+                <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span className="font-mono font-bold text-white tracking-wide">{timeStr}</span>
+                <span className="px-1.5 py-0.2 rounded bg-[#1B4332] text-[#F5D061] text-[10px] font-bold border border-[#D4AF37]/40">
+                  PST
+                </span>
+              </div>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
@@ -250,7 +302,7 @@ export const WeatherWidget: React.FC = () => {
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#F5D061] to-transparent opacity-80" />
 
               <div>
-                <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
                     <span className="text-xs uppercase tracking-widest text-[#E4C868] font-bold">
                       {weather.location}
@@ -259,8 +311,24 @@ export const WeatherWidget: React.FC = () => {
                       {weather.subArea}, {weather.district}, {weather.province}
                     </p>
                   </div>
-                  <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
+                  <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner shrink-0">
                     {getWeatherIcon(weather.condition)}
+                  </div>
+                </div>
+
+                {/* Live Date & Time Bar inside Weather Frame */}
+                <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 border border-[#D4AF37]/35 text-xs text-stone-200 mb-3 shadow-inner">
+                  <div className="flex items-center gap-1.5 text-stone-200">
+                    <Calendar className="w-3.5 h-3.5 text-[#F5D061]" />
+                    <span className="font-medium text-[#FFF0A0]">{dateStr}</span>
+                  </div>
+                  <span className="text-[#D4AF37]/50">•</span>
+                  <div className="flex items-center gap-1.5 text-white font-mono">
+                    <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span className="font-bold text-white tracking-wider">{timeStr}</span>
+                    <span className="text-[10px] font-sans px-1.5 py-0.2 rounded bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 font-semibold">
+                      PST
+                    </span>
                   </div>
                 </div>
 
