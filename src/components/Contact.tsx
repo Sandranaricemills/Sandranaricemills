@@ -215,7 +215,7 @@ export const Contact: React.FC = () => {
               <div className="p-3 bg-white border-b border-stone-200 flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-800 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-emerald-800" />
-                  {isUrdu ? 'جھنگ تا سرگودھا روڈ (28 کلومیٹر)' : '28 KM Jhang–Sargodha Road Location'}
+                  {isUrdu ? 'سندرانہ رائس ملز کا پن مقام (28 کلومیٹر جھنگ تا سرگودھا روڈ)' : 'Sandrana Rice Mills • Exact Mill Pin Location'}
                 </span>
                 <a
                   href={MILL_INFO.googleMapsUrl}
@@ -223,26 +223,58 @@ export const Contact: React.FC = () => {
                   rel="noopener noreferrer"
                   className="text-emerald-800 hover:text-emerald-950 font-medium inline-flex items-center gap-1"
                 >
-                  <span>{isUrdu ? 'گوگل میپ کھولیں' : 'Open Maps'}</span>
+                  <span>{isUrdu ? 'گوگل میپ کھولیں' : 'Open in Maps'}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
-              <div className="relative w-full h-56 bg-stone-200">
+              <div className="relative w-full h-64 sm:h-72 bg-stone-200">
                 <iframe
-                  title="Sandrana Rice Mills Location"
+                  title="Sandrana Rice Mills Exact Location Pin"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?q=28+KM+Jhang-Sargodha+Road+Jhang+Punjab+Pakistan&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                  src={MILL_INFO.googleMapsEmbedUrl}
                 />
+                {/* Visual Location Pin Overlay Badge */}
+                <div className="absolute top-3 left-3 pointer-events-none bg-stone-900/90 backdrop-blur-xs text-white border border-stone-700/60 shadow-md rounded-lg py-1.5 px-3 flex items-center gap-2 text-xs">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                  </span>
+                  <div>
+                    <p className="font-bold text-[#E4C868] text-[11px] leading-tight flex items-center gap-1">
+                      <span>{isUrdu ? 'سندرانہ رائس ملز' : 'SANDRANA RICE MILLS'}</span>
+                      <span className="text-[9px] bg-emerald-700/80 text-white font-normal px-1 py-0.5 rounded">
+                        {isUrdu ? 'پن لوکیشن' : 'Verified Pin'}
+                      </span>
+                    </p>
+                    <p className="text-[10px] text-stone-300 leading-tight">
+                      31.5053° N, 72.2575° E • 28 KM Jhang–Sargodha Rd
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={MILL_INFO.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-3 right-3 bg-white/95 hover:bg-white text-emerald-900 text-xs font-semibold py-1.5 px-3 rounded shadow-md border border-stone-200 flex items-center gap-1.5 transition"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{isUrdu ? 'راستہ اور سمت' : 'Directions & Pin'}</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400" />
+                </a>
               </div>
-              <div className="p-3 bg-stone-50 text-[11px] text-slate-500">
-                {isUrdu
-                  ? 'نوٹ: ہول سیل ڈیلرز اور برآمدی نمائندوں سے گزارش ہے کہ فیکٹری تشریف آوری سے قبل پیشگی رابطہ کر لیں تاکہ انتظامیہ آپ کا پرتپاک استقبال کر سکے۔'
-                  : 'Visiting Protocol: Wholesale delegates and export representatives are requested to confirm arrivals in advance to arrange a guided mill walkthrough with management.'}
+              <div className="p-3 bg-stone-50 border-t border-stone-200 text-[11px] text-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <span>
+                  <strong>GPS:</strong> 31.505335° N, 72.257457° E • {isUrdu ? '28 کلومیٹر سنگ میل، جھنگ تا سرگودھا روڈ' : '28 KM Milestone, Jhang–Sargodha Road'}
+                </span>
+                <span className="text-slate-400">
+                  {isUrdu ? 'چاول پراسیسنگ اور ترسیلی مرکز' : 'Main Processing Plant & Logistics Hub'}
+                </span>
               </div>
             </div>
 

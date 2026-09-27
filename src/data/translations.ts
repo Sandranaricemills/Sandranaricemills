@@ -11,7 +11,7 @@ export const translations = {
     fullAddress: '28 KM Jhang–Sargodha Road, Jhang, Punjab, Pakistan',
     phone: '+92 300 7260962',
     phoneFormatted: '+92 300 7260962',
-    email: 'sandranaricemills@gmail.com',
+    email: 'sandranaricemills1@gmail.com',
 
     // Header & Nav
     nav: {
@@ -263,7 +263,7 @@ export const translations = {
     fullAddress: '28 کلومیٹر جھنگ تا سرگودھا روڈ، جھنگ، پنجاب، پاکستان',
     phone: '+92 300 7260962',
     phoneFormatted: '+92 300 7260962',
-    email: 'sandranaricemills@gmail.com',
+    email: 'sandranaricemills1@gmail.com',
 
     // Header & Nav
     nav: {

@@ -7,9 +7,14 @@ export const MILL_INFO = {
   address: '28 KM Jhang–Sargodha Road, Jhang, Punjab, Pakistan',
   phone: '+92 300 7260962',
   whatsappRaw: '923007260962',
-  email: 'sandranaricemills@gmail.com',
+  email: 'sandranaricemills1@gmail.com',
   workingHours: 'Monday – Saturday: 8:00 AM – 7:00 PM (PST)',
-  googleMapsUrl: 'https://maps.google.com/?q=28+KM+Jhang-Sargodha+Road+Jhang+Punjab+Pakistan',
+  coordinates: {
+    lat: 31.505335,
+    lng: 72.257457,
+  },
+  googleMapsUrl: 'https://maps.google.com/?q=31.505335,72.257457+(Sandrana+Rice+Mills)',
+  googleMapsEmbedUrl: 'https://maps.google.com/maps?q=31.505335,72.257457+(Sandrana+Rice+Mills)&t=&z=14&ie=UTF8&iwloc=B&output=embed',
 };
 
 export const IMAGE_SLOTS: ImageSlot[] = [

@@ -44,7 +44,7 @@ export const generateCatalogPDF = async (): Promise<void> => {
     doc.setFontSize(7.5);
     doc.setTextColor(220, 220, 220);
     doc.text(
-      '28 KM Jhang–Sargodha Road, Punjab, Pakistan • Direct: +92 300 7100412 • info@sandranaricemills.com',
+      `28 KM Jhang–Sargodha Road, Punjab, Pakistan • Direct: ${MILL_INFO.phone} • ${MILL_INFO.email}`,
       margin,
       24
     );
