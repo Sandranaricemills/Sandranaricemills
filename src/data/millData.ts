@@ -2,6 +2,9 @@ import { ProductItem, ManagementProfile, ProcessingStep, ImageSlot } from '../ty
 
 export const MILL_INFO = {
   name: 'SANDRANA RICE MILLS',
+  websiteName: 'sandranaricemills',
+  domain: 'sandranaricemills.com',
+  websiteUrl: 'https://sandranaricemills.com',
   tagline: 'Premium Rice. Trusted Quality.',
   secondaryTagline: 'Quality Rice from the Heart of Punjab, Pakistan',
   address: '28 KM Jhang–Sargodha Road, Jhang, Punjab, Pakistan',
@@ -111,11 +114,11 @@ export const IMAGE_SLOTS: ImageSlot[] = [
   {
     key: 'product_super_basmati',
     defaultFileName: 'PADDY RICE 1121.jpg',
-    title: 'Super Basmati & 1121 Dual Platter',
+    title: 'Super Basmati & 1121 Paddy Rice',
     targetSection: 'Product',
-    assignedLabel: 'Super Basmati Rice & 1121 Commercial Dual',
-    aspectRatio: '16:9',
-    description: 'Carved wooden platter showing unhusked golden paddy and milled white long grain rice with export grade insignia.',
+    assignedLabel: 'Super Basmati Rice & 1121 Paddy Selection',
+    aspectRatio: '1:1',
+    description: 'Golden ripe paddy grains heaped in a ceramic bowl on rustic burlap with fresh green rice panicles.',
   },
   {
     key: 'leadership_saeed',

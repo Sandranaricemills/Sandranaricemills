@@ -98,7 +98,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         };
       }
       return {
-        url: `/images/${encodeURIComponent(slot.defaultFileName)}?v=srm_v2`,
+        url: `/images/${encodeURIComponent(slot.defaultFileName)}?v=srm_v3`,
         fileName: slot.defaultFileName,
         isCustom: false,
       };

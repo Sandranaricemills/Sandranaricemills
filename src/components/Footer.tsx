@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   BellRing,
   Sparkles,
+  Globe,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -336,6 +337,13 @@ export const Footer: React.FC = () => {
                 <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
                 <a href={`mailto:${MILL_INFO.email}`} className="hover:text-[#D4AF37] transition">
                   {MILL_INFO.email}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2.5" dir="ltr">
+                <Globe className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                <a href={MILL_INFO.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition font-medium">
+                  {MILL_INFO.domain}
                 </a>
               </div>
             </div>

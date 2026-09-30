@@ -11,7 +11,8 @@ import {
   Send,
   CheckCircle2,
   Building,
-  ExternalLink
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 
 export const Contact: React.FC = () => {
@@ -171,6 +172,25 @@ export const Contact: React.FC = () => {
                     <a href={`mailto:${MILL_INFO.email}`} className="hover:text-emerald-800 transition">
                       {MILL_INFO.email}
                     </a>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-emerald-900 text-[#D4AF37] flex items-center justify-center shrink-0 mt-0.5">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
+                    {isUrdu ? 'ویب سائٹ / ڈومین' : 'Official Website / Domain'}
+                  </span>
+                  <p className="text-sm font-semibold text-slate-900 mt-0.5" dir="ltr">
+                    <a href={MILL_INFO.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-800 transition">
+                      {MILL_INFO.domain}
+                    </a>
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {isUrdu ? 'مستند مل پورٹل اور برآمدی کیٹلاگ' : 'Official portal: sandranaricemills'}
                   </p>
                 </div>
               </div>

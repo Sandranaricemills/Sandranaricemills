@@ -12,6 +12,9 @@ export const translations = {
     phone: '+92 300 7260962',
     phoneFormatted: '+92 300 7260962',
     email: 'sandranaricemills1@gmail.com',
+    website: 'sandranaricemills.com',
+    websiteUrl: 'https://sandranaricemills.com',
+    domainName: 'sandranaricemills',
 
     // Header & Nav
     nav: {
@@ -288,6 +291,9 @@ export const translations = {
     phone: '+92 300 7260962',
     phoneFormatted: '+92 300 7260962',
     email: 'sandranaricemills1@gmail.com',
+    website: 'sandranaricemills.com',
+    websiteUrl: 'https://sandranaricemills.com',
+    domainName: 'sandranaricemills',
 
     // Header & Nav
     nav: {
